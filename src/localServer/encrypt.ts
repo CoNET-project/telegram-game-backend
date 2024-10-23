@@ -2,6 +2,7 @@
  * 				CONET Platform
  *
  */
+declare const ethers;
 
 const workerReadyChannel = "conet-platform";
 const workerProcessChannel = "workerLoader";
@@ -16,7 +17,7 @@ self.onhashchange = () => {
 };
 
 const initEncryptWorker = async () => {
-  const baseUrl = self.name + "/workers/";
+  const baseUrl = self.name + "workers/";
   const channelLoading = new BroadcastChannel(workerProcessChannel);
   self.importScripts(baseUrl + "Buffer.js");
   channelLoading.postMessage(10);
@@ -36,31 +37,20 @@ const initEncryptWorker = async () => {
   self.importScripts(
     "https://cdnjs.cloudflare.com/ajax/libs/jimp/0.22.12/jimp.min.js"
   );
+  channelLoading.postMessage(30);
+  self.importScripts(baseUrl + "util.js");
+  // self.importScripts ( 'https://cdnjs.cloudflare.com/ajax/libs/forge/1.3.1/forge.min.js' )
+  //self.importScripts ( baseUrl + 'Pouchdb.js' )
+  // self.importScripts (  baseUrl + 'PouchdbFind.js' )
+  self.importScripts(baseUrl + "main.js");
+
   self.importScripts(
     "https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.1/ethers.umd.min.js"
   );
-  self.importScripts(
-    "https://cdn.jsdelivr.net/npm/openpgp@5.11.2/dist/openpgp.min.js"
-  );
-
-  channelLoading.postMessage(30);
-
-  self.importScripts(baseUrl + "util.js");
-  self.importScripts(baseUrl + "CoNETModule.js");
-  self.importScripts(baseUrl + "miningV2.js");
-  self.importScripts(baseUrl + "smartContractABI.js");
-  self.importScripts(baseUrl + "main_v2.js");
 
   channelLoading.postMessage(90);
   channel.addEventListener("message", channelWorkerDoCommand);
-
   await checkStorage();
-
-  listenProfileVer();
-
-  createOrGetWallet();
-
-  // testFunction();
 };
 
 const returnUUIDChannel = (cmd: worker_command) => {
@@ -68,7 +58,7 @@ const returnUUIDChannel = (cmd: worker_command) => {
     return logger(`getPrimaryBalance cmd uuid is null`, cmd);
   }
   const sendChannel = new BroadcastChannel(cmd.uuid);
-  sendChannel.postMessage(customJsonStringify(cmd));
+  sendChannel.postMessage(JSON.stringify(cmd));
   sendChannel.close();
 };
 
@@ -88,76 +78,17 @@ let getFaucetCount = 0;
 
 const processCmd = async (cmd: worker_command) => {
   switch (cmd.cmd) {
-    case "importWallet": {
-      return importWallet(cmd);
-    }
-
-    case "getRouletteResult": {
-      return getRouletteResult(cmd);
-    }
-
-    case "unlockTicket": {
-      return unlockTicket(cmd);
-    }
-
-    case "getTicketResult": {
-      return getTicketResult(cmd);
+    case "getWallet": {
+      return getWallet(cmd);
     }
 
     case "startMining": {
-      return startMiningV1(cmd);
+      return startMining(cmd);
     }
 
     case "stopMining": {
-      return stopMiningV1(cmd);
-    }
-
-    case "claimDailyReward": {
-      return claimDailyReward(cmd);
-    }
-
-    case "checkTwitter": {
-      return checkTwitter(cmd);
-    }
-
-    case "checkTelegram": {
-      return checkTelegram(cmd);
-    }
-
-    case "checkSocialMedias": {
-      return checkSocialMedias(cmd);
-    }
-
-    case "checkPartner": {
-      return checkPartner(cmd);
-    }
-
-    case "registerReferrer": {
-      return registerReferrer(cmd);
-    }
-
-    case "clearStorage": {
-      return clearStorage(cmd);
-    }
-
-    case "saveGameProfileInfo": {
-      return saveGameProfileInfo(cmd);
-    }
-
-    case "transferToken": {
-      return await transferToken(cmd);
-    }
-
-    case "estimateGas": {
-      return await estimateGas(cmd);
-    }
-
-    case "getNativeBalance": {
-      return await getNativeBalance(cmd);
-    }
-
-    case "isAddress": {
-      return isAddress(cmd);
+      miningStatus = "STOP";
+      return returnUUIDChannel(cmd);
     }
 
     default: {

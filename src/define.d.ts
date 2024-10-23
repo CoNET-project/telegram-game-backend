@@ -4,7 +4,6 @@ declare const scrypt: any;
 declare const async: any;
 declare const JSZip: any;
 declare const PouchDB: any;
-declare const ethers: any;
 
 interface imapConnect {
   imapServer: string;
@@ -40,8 +39,6 @@ type nodes_info = {
   region: string;
   armoredPublicKey: string;
   publicKeyObj?: any;
-  domain?: string;
-  nftNumber: number;
 };
 
 interface connect_imap_reqponse {
@@ -188,25 +185,78 @@ declare type verification =
 declare type conetMiner = "Err_Server_Unreachable" | "Err_Multiple_IP";
 
 declare type WorkerCommand =
+  | "READY"
+  | "getRegiestNodes"
+  | "beforeunload"
+  | "createAccount"
+  | "testPasscode"
+  | "showSRP"
+  | "unlock_cCNTP"
+  | "getWallet"
+  | "encrypt_TestPasscode"
+  | "encrypt_createPasscode"
+  | "encrypt_lock"
+  | "invitation"
+  | "encrypt_deletePasscode"
+  | "preBurnCCNTP"
+  | "storePreferences"
+  | "newProfile"
+  | "storeProfile"
+  | "urlProxy"
+  | "saveDomain"
+  | "getDomain"
+  | "setRegion"
+  | "getGuardianRegion"
+  | "getFaucet"
+  | "isAddress"
+  | "syncAssetV1"
+  | "sendAsset"
+  | "getUSDCPrice"
+  | "buyUSDC"
+  | "getWorkerClientID"
+  | "getAllOtherAssets"
+  | "mintCoNETCash"
+  | "getSINodes"
+  | "getRecipientCoNETCashAddress"
+  | "getUserProfile"
+  | "burnCCNTP"
+  | "showLeaderboard"
+  | "sendMessage"
+  | "incomeData"
+  | "WORKER_MESSAGE"
+  | "getCONETBalance"
+  | "startProxy"
+  | "registerReferrer"
+  | "SaaSRegister"
+  | "getContainer"
+  | "ipaddress"
+  | "startLiveness"
+  | "stopLiveness"
+  | "isLivenessRunning"
+  | "importWallet"
   | "startMining"
   | "stopMining"
-  | "checkTwitter"
-  | "checkTelegram"
-  | "checkSocialMedias"
-  | "checkPartner"
-  | "registerReferrer"
-  | "getRouletteResult"
-  | "getTicketResult"
-  | "importWallet"
-  | "clearStorage"
-  | "saveGameProfileInfo"
-  | "getGameProfileInfo"
-  | "unlockTicket"
+  //		from service worker
+  | "urlProxy"
+  | "saveDomain"
+  | "getDomain"
+  | "getWorkerClientID"
+  | "getRefereesList"
+  | "getAllNodes"
+  | "getAllProfiles"
+  | "updateProfile"
+  | "addProfile"
+  | "resetPasscode"
+  | "getAssetsPrice"
+  | "recoverAccount"
+  | "CONETFaucet"
+  | "prePurchase"
+  | "guardianPurchase"
+  | "fx168PrePurchase"
+  | "claimToken"
   | "transferToken"
   | "estimateGas"
-  | "claimDailyReward"
-  | "getNativeBalance"
-  | "isAddress";
+  | "startSilentPass";
 
 type SINodesSortby =
   | "CUSTOMER_REVIEW"
@@ -300,21 +350,6 @@ interface profile extends keyPair {
   nodeID?: number;
   nodeIP_address?: string;
   nodeRegion?: string;
-  tickets: conet_ticket;
-  isTicketUnlocked?: boolean;
-  game?: game | null;
-  dailyClaimWeek?: any;
-}
-
-interface game {
-  username?: string;
-  bio?: string;
-  imageUrl?: string;
-  gateway?: string;
-}
-
-interface conet_ticket {
-  balance: string;
 }
 
 interface publicProfile {
@@ -467,9 +502,7 @@ type SICommandObj_Command =
   | "connecting"
   | "SaaS_Proxy"
   | "SaaS_Sock5"
-  | "SaaS_Sock5_Data_Entry"
-  | "mining"
-  | "mining_validator";
+  | "SaaS_Sock5_Data_Entry";
 
 interface SICommandObj {
   command: SICommandObj_Command;
@@ -490,15 +523,13 @@ interface ethSignedObj {
   v: string;
 }
 
-interface nodeResponse {
-  status: number;
-  epoch: number;
-  hash: string;
-  rate: string;
-  nodeWallet: string;
-  currentCCNTP?: string;
-  minerResponseHash?: string;
-}
+// interface CoNETCash_authorized {
+// 	id: string
+// 	to: string
+// 	amount: number
+// 	type: 'USDC'
+// 	from: string
+// }
 
 type clientProfile = {
   armoredPublicKey: string;
@@ -677,7 +708,12 @@ interface conetPlatform {
   passcode: "LOCKED" | "UNLOCKED" | "NONE";
 }
 
-type command = "balanceStatus" | "miningStatus" | "profileVer";
+type command =
+  | "profileVer"
+  | "assets"
+  | "purchaseStatus"
+  | "miningStatus"
+  | "tokenTransferStatus";
 interface channelWroker {
   cmd: command;
   data: any[];
